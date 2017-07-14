@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import generic
-from .forms import RegistrationForm, LoginForm
+from .forms import RegistrationForm, LoginForm, FinalForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse_lazy
@@ -12,7 +12,7 @@ from braces import views
 class HomePageView(generic.TemplateView):
     template_name = "home.html"
 
-class RegisterView(views.AnonymousRequiredMixin, 
+class RegisterView(views.AnonymousRequiredMixin,
                    views.FormValidMessageMixin,
                    generic.CreateView):
     form_class = RegistrationForm
@@ -49,3 +49,14 @@ class LogoutView(views.LoginRequiredMixin,
         logout(request)
         self.messages.success("See ya!")
         return super(LogoutView, self).get(request, *args, **kwargs)
+
+#Bethany Sanders
+class FinalView(views.FormValidMessageMixin,
+                generic.CreateView):
+    form_class = FinalForm
+    template_name = 'user/final.html'
+    form_valid_message = "Here is the information you entered: "
+    success_url = reverse_lazy('finals')
+
+    def form_valid(self, form):
+        return super(FinalView, self).form_valid(form)
