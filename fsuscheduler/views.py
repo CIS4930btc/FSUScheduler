@@ -7,7 +7,9 @@ from .forms import RegistrationForm, LoginForm, FinalForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse_lazy
+from django.views.generic.base import ContextMixin
 from braces import views
+from finals.models import Final
 
 class HomePageView(generic.TemplateView):
     template_name = "home.html"
@@ -51,12 +53,14 @@ class LogoutView(views.LoginRequiredMixin,
         return super(LogoutView, self).get(request, *args, **kwargs)
 
 #Bethany Sanders
-class FinalView(views.FormValidMessageMixin,
+class FinalView(views.LoginRequiredMixin,
+                views.FormValidMessageMixin,
                 generic.CreateView):
     form_class = FinalForm
     template_name = 'user/final.html'
-    form_valid_message = "Here is the information you entered: "
+    form_valid_message = "The information you entered has been added to the database. "
     success_url = reverse_lazy('finals')
 
     def form_valid(self, form):
+        form.instance.user_name = self.request.user
         return super(FinalView, self).form_valid(form)
