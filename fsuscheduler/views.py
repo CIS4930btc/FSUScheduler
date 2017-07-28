@@ -10,6 +10,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic.base import ContextMixin
 from braces import views
 from finals.models import Final
+from .scheduleRetriever import get_exam_info, get_specific_final
+from django.contrib import messages
 
 class HomePageView(generic.TemplateView):
     template_name = "home.html"
@@ -58,9 +60,26 @@ class FinalView(views.LoginRequiredMixin,
                 generic.CreateView):
     form_class = FinalForm
     template_name = 'user/final.html'
+    form_invalid_message = "We couldn't find that final. Double check your information and try again!"
     form_valid_message = "The information you entered has been added to the database. "
     success_url = reverse_lazy('finals')
+    Model = Final
 
     def form_valid(self, form):
+        class_time_format = str(form.instance.class_time)
+        if class_time_format[0] == "0":
+            class_time_format = class_time_format[1:5]
+        else:
+            class_time_format = class_time_format[0:5]
+        class_time_format += " " + form.instance.class_timeframe
+
+        result = get_specific_final(form.instance.class_semester, form.instance.class_name,
+                                    form.instance.class_day, class_time_format)
+
+        if result == "":
+            messages.error(self.request, "We couldn't find that final.")
+            return self.form_invalid(form)
+
+        form.instance.final_info = result;
         form.instance.user_name = self.request.user
         return super(FinalView, self).form_valid(form)

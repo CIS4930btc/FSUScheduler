@@ -38,7 +38,7 @@ def get_exam_info(url):
     block_exam_classes = re.findall(r"<td>[A-Z]{3}[^<]+</td>", block_exams_text)
     block_exam_days = re.findall(r"<td>(Monday|Tuesday|Wednesday|Thursday|Friday)", block_exams_text)
     block_exam_times = re.findall(r"<td>[0-9]{1,2}:[0-9][0-9] . [0-9]{1,2}:[0-9][0-9] ....</td>", block_exams_text)
-    
+
     #Trim fat off block_exam classes
     for i in range(0,len(block_exam_classes)):
     	block_exam_classes[i] = block_exam_classes[i].replace("<td>", "")
@@ -114,6 +114,32 @@ def get_exam_info(url):
     #Return composite dictionary
     return exam_info
 
+#Bethany Sanders
+def get_specific_final(semester, name, day, time):
+    '''Searches the list returned by get_exam_info for the users final time'''
+    print((semester))
+    print((name))
+    print((day))
+    print((time))
+
+    if(semester == "F"):
+        print("going to site")
+        exam_info = get_exam_info("http://www.registrar.fsu.edu/registration_guide/fall/exam_schedule/")
+    else:
+        print("going to site")
+        exam_info = get_exam_info("http://www.registrar.fsu.edu/registration_guide/spring/exam_schedule/")
+
+    day_finals = exam_info[day]
+    result = ""
+
+    for final in day_finals:
+        if final[0] == time:
+            print("getting result")
+            result = str(final[1]) +  " " + str(final[2])
+
+    return result;
+
 if __name__ == "__main__":
-	print(get_exam_info("http://www.registrar.fsu.edu/registration_guide/fall/exam_schedule/"))
-	print(get_exam_info("http://www.registrar.fsu.edu/registration_guide/spring/exam_schedule/"))
+	#print(get_exam_info("http://www.registrar.fsu.edu/registration_guide/fall/exam_schedule/"))
+	#print(get_exam_info("http://www.registrar.fsu.edu/registration_guide/spring/exam_schedule/"))
+     print(get_specific_final("F", "class", "MWF", "9:05 a.m."))

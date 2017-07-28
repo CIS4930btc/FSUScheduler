@@ -38,7 +38,7 @@ class LoginForm(AuthenticationForm):
 class FinalForm(forms.ModelForm):
     class Meta:
         model = Final
-        fields = ['class_name', 'class_day', 'class_time']
+        fields = ['class_name', 'class_semester', 'class_day', 'class_time', 'class_timeframe']
 
     def __init__(self, *args, **kwargs):
         super(FinalForm, self).__init__(*args, **kwargs)
