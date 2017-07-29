@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import TemplateView
 from .views import HomePageView
-from .views import RegisterView, LoginView, LogoutView, FinalView
+from .views import RegisterView, LoginView, LogoutView, FinalView, ProfileView
 
 urlpatterns = [
     url(r'^$', HomePageView.as_view(), name='home'),
@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^user/login/$', LoginView.as_view(), name='login'),
     url(r'^user/register/$', RegisterView.as_view(), name='register'),
     url(r'^user/logout/$', LogoutView.as_view(), name='logout'),
-
+    url(r'^user/profile/$', ProfileView.as_view(), name='profile'),
     url(r'^user/final/$', FinalView.as_view(), name='finals'),
 
     url(r'^admin/', admin.site.urls),

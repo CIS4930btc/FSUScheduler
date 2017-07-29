@@ -13,7 +13,8 @@
         {% if user.is_authenticated %}
             Logged in as: {{ user.username }} |
             <a href="{% url 'finals' %}">Finals</a> |
-            <a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'logout' %}">Logout</a> |
+            <a href="{% url 'profile' %}">Profile</a> 
         {% else %}
             <a href="{% url 'login' %}">Login</a> |
             <a href="{% url 'register' %}">Register</a>

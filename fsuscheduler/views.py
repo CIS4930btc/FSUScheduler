@@ -12,6 +12,7 @@ from braces import views
 from finals.models import Final
 from .scheduleRetriever import get_exam_info, get_specific_final
 from django.contrib import messages
+from django.views.generic import TemplateView
 
 class HomePageView(generic.TemplateView):
     template_name = "home.html"
@@ -57,12 +58,13 @@ class LogoutView(views.LoginRequiredMixin,
 #Bethany Sanders
 class FinalView(views.LoginRequiredMixin,
                 views.FormValidMessageMixin,
+                views.FormInvalidMessageMixin,
                 generic.CreateView):
     form_class = FinalForm
     template_name = 'user/final.html'
-    form_invalid_message = "We couldn't find that final. Double check your information and try again!"
-    form_valid_message = "The information you entered has been added to the database. "
-    success_url = reverse_lazy('finals')
+    form_valid_message = "The information you entered has been added to your finals list."
+    form_invalid_message = "We couldn't find that final."
+    success_url = reverse_lazy('profile')
     Model = Final
 
     def form_valid(self, form):
@@ -77,9 +79,23 @@ class FinalView(views.LoginRequiredMixin,
                                     form.instance.class_day, class_time_format)
 
         if result == "":
-            messages.error(self.request, "We couldn't find that final.")
             return self.form_invalid(form)
 
         form.instance.final_info = result;
         form.instance.user_name = self.request.user
         return super(FinalView, self).form_valid(form)
+
+#Bethany Sanders
+class ProfileView(TemplateView):
+        template_name = 'user/profile.html'
+        model = Final
+
+        def get_context_data(self, *args, **kwargs):
+            context = super(ProfileView, self).get_context_data(*args, **kwargs)
+            context['ngapp'] = "fsuscheduler"
+            context['query_results'] = self.get_queryset()
+            return context
+
+        def get_queryset(self):
+            query_results = Final.objects.all().filter(user_name = self.request.user)
+            return query_results
