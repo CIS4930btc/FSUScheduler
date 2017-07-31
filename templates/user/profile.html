@@ -1,32 +1,18 @@
-<!-- Bethany Sanders-->
 {% extends 'base.html' %}
 
 {% load crispy_forms_tags %}
 
-{% block title_extra %} - Profile{% endblock %}
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+{% block title_extra %} - Your Profile{% endblock %}
 
-<!-- jQuery library -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-<!-- Latest compiled JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 {% block content %}
-    <h2>User Profile</h2>
-    <table class="table table-striped">
-      <thead class = "thead-inverse">
-        <tr>
-          <th>Class</th>
-          <th>Final</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          {% for item in query_results %}
-          <tr>
-              <td>{{ item.class_name }}</td>
-              <td>{{ item.final_info}}</td>
-          </tr>
-        {% endfor %}
-    </table>
+    <h2>Your Profile</h2>
+
+    <ul>
+    <li>
+        <a href="{% url 'profile_classes' %}">View/edit your classes</a>
+    </li>
+    <li>
+        <a href="{% url 'profile_finals' %}">View your finals</a>
+    </li>
+
 {% endblock %}

@@ -18,7 +18,9 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import TemplateView
 from .views import HomePageView
-from .views import RegisterView, LoginView, LogoutView, FinalView, ProfileView
+from .views import RegisterView, LoginView, LogoutView
+from .views import AddClassView
+from .views import ProfileView, ProfileFinalsView, ProfileClassesView
 
 urlpatterns = [
     url(r'^$', HomePageView.as_view(), name='home'),
@@ -27,7 +29,9 @@ urlpatterns = [
     url(r'^user/register/$', RegisterView.as_view(), name='register'),
     url(r'^user/logout/$', LogoutView.as_view(), name='logout'),
     url(r'^user/profile/$', ProfileView.as_view(), name='profile'),
-    url(r'^user/final/$', FinalView.as_view(), name='finals'),
+    url(r'^user/profile/classes/$', ProfileClassesView.as_view(), name='profile_classes'),
+    url(r'^user/profile/finals/$', ProfileFinalsView.as_view(), name='profile_finals'),
+    url(r'^user/add-class/$', AddClassView.as_view(), name='add_class'),
 
     url(r'^admin/', admin.site.urls),
 ]

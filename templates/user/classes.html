@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title_extra %} - Your Classes{% endblock %}
+
+{% block content %}
+    <h2>Your Classes</h2>
+    <table class="table table-striped">
+      <thead class="thead-inverse">
+        <tr>
+          <th>Course Code</th>
+          <th>Semester</th>
+          <th>Days</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          {% for class in classes %}
+          <tr>
+              <td>{{ class.class_name }}</td>
+              {% if class.class_semester == "F" %}
+                  <td>Fall</td>
+              {% else %}
+                  <td>Spring</td>
+              {% endif %}
+              <td>{{ class.class_day }}</td>
+              <td>{{ class.class_time }} {{ class.class_timeframe }}</td>
+          </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

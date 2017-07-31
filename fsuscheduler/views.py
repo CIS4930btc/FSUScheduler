@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import generic
-from .forms import RegistrationForm, LoginForm, FinalForm
+from .forms import RegistrationForm, LoginForm, AddClassForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse_lazy
@@ -56,14 +56,14 @@ class LogoutView(views.LoginRequiredMixin,
         return super(LogoutView, self).get(request, *args, **kwargs)
 
 #Bethany Sanders
-class FinalView(views.LoginRequiredMixin,
+class AddClassView(views.LoginRequiredMixin,
                 views.FormValidMessageMixin,
                 views.FormInvalidMessageMixin,
                 generic.CreateView):
-    form_class = FinalForm
-    template_name = 'user/final.html'
-    form_valid_message = "The information you entered has been added to your finals list."
-    form_invalid_message = "We couldn't find that final."
+    form_class = AddClassForm
+    template_name = 'user/add_class.html'
+    form_valid_message = "The information you entered has been added to your class list."
+    form_invalid_message = "We couldn't find that class."
     success_url = reverse_lazy('profile')
     Model = Final
 
@@ -83,15 +83,18 @@ class FinalView(views.LoginRequiredMixin,
 
         form.instance.final_info = result;
         form.instance.user_name = self.request.user
-        return super(FinalView, self).form_valid(form)
+        return super(AddClassView, self).form_valid(form)
+
+class ProfileView(generic.TemplateView):
+    template_name = "user/profile.html"
 
 #Bethany Sanders
-class ProfileView(TemplateView):
-        template_name = 'user/profile.html'
+class ProfileFinalsView(TemplateView):
+        template_name = 'user/finals.html'
         model = Final
 
         def get_context_data(self, *args, **kwargs):
-            context = super(ProfileView, self).get_context_data(*args, **kwargs)
+            context = super(ProfileFinalsView, self).get_context_data(*args, **kwargs)
             context['ngapp'] = "fsuscheduler"
             context['query_results'] = self.get_queryset()
             return context
@@ -99,3 +102,20 @@ class ProfileView(TemplateView):
         def get_queryset(self):
             query_results = Final.objects.all().filter(user_name = self.request.user)
             return query_results
+
+class ProfileClassesView(TemplateView):
+        template_name = 'user/classes.html'
+        model = Final
+
+        def get_context_data(self, *args, **kwargs):
+            context = super(ProfileClassesView, self).get_context_data(*args, **kwargs)
+            context['classes'] = self.get_classes()
+            return context
+
+        def get_classes(self):
+            classes = Final.objects.all().filter(user_name = self.request.user)
+            for c in classes:
+                time = str(getattr(c, 'class_time'))
+                time = time[:-3]
+                setattr(c, 'class_time', time)
+            return classes

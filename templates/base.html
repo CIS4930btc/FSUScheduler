@@ -11,10 +11,9 @@
         <h1>FSU Scheduler</h1>
         <a href="{% url 'home' %}">Home</a> |
         {% if user.is_authenticated %}
-            Logged in as: {{ user.username }} |
-            <a href="{% url 'finals' %}">Finals</a> |
-            <a href="{% url 'logout' %}">Logout</a> |
-            <a href="{% url 'profile' %}">Profile</a> 
+            <a href="{% url 'add_class' %}">Add Class</a> |
+            <a href="{% url 'profile' %}">Profile</a> |
+            <a href="{% url 'logout' %}">Logout</a> (logged in as: {{ user.username }})
         {% else %}
             <a href="{% url 'login' %}">Login</a> |
             <a href="{% url 'register' %}">Register</a>

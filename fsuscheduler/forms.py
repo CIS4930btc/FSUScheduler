@@ -35,17 +35,17 @@ class LoginForm(AuthenticationForm):
         )
 
 #Bethany Sanders
-class FinalForm(forms.ModelForm):
+class AddClassForm(forms.ModelForm):
     class Meta:
         model = Final
         fields = ['class_name', 'class_semester', 'class_day', 'class_time', 'class_timeframe']
 
     def __init__(self, *args, **kwargs):
-        super(FinalForm, self).__init__(*args, **kwargs)
+        super(AddClassForm, self).__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.layout = Layout(
             ButtonHolder(
-                Submit('final', 'Add Final', css_class='btn-primary')
+                Submit('add-class', 'Add Class', css_class='btn-primary')
             )
         )
