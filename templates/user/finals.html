@@ -5,20 +5,24 @@
 
 {% block content %}
     <h2>Your Finals</h2>
-    <table class="table table-striped">
-      <thead class="thead-inverse">
-        <tr>
-          <th>Class</th>
-          <th>Final</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          {% for item in query_results %}
-          <tr>
-              <td>{{ item.class_name }}</td>
-              <td>{{ item.final_info}}</td>
-          </tr>
-        {% endfor %}
-    </table>
+    {% if query_results|length %}
+        <table class="table table-striped">
+          <thead class="thead-inverse">
+            <tr>
+              <th>Class</th>
+              <th>Final</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {% for item in query_results %}
+              <tr>
+                  <td>{{ item.class_name }}</td>
+                  <td>{{ item.final_info}}</td>
+              </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+	You haven't added any classes <a href="{% url 'add_class' %}">yet</a>.
+    {% endif %}
 {% endblock %}

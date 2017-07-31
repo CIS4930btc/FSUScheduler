@@ -21,6 +21,7 @@ from .views import HomePageView
 from .views import RegisterView, LoginView, LogoutView
 from .views import AddClassView
 from .views import ProfileView, ProfileFinalsView, ProfileClassesView
+from .views import DeleteClassView
 
 urlpatterns = [
     url(r'^$', HomePageView.as_view(), name='home'),
@@ -32,6 +33,7 @@ urlpatterns = [
     url(r'^user/profile/classes/$', ProfileClassesView.as_view(), name='profile_classes'),
     url(r'^user/profile/finals/$', ProfileFinalsView.as_view(), name='profile_finals'),
     url(r'^user/add-class/$', AddClassView.as_view(), name='add_class'),
+    url(r'^user/delete-class/(?P<classId>\d+)/$', DeleteClassView, name='delete_class'),
 
     url(r'^admin/', admin.site.urls),
 ]

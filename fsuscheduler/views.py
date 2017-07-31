@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from .forms import RegistrationForm, LoginForm, AddClassForm
 from django.contrib.auth.models import User
@@ -57,9 +57,9 @@ class LogoutView(views.LoginRequiredMixin,
 
 #Bethany Sanders
 class AddClassView(views.LoginRequiredMixin,
-                views.FormValidMessageMixin,
-                views.FormInvalidMessageMixin,
-                generic.CreateView):
+                   views.FormValidMessageMixin,
+                   views.FormInvalidMessageMixin,
+                   generic.CreateView):
     form_class = AddClassForm
     template_name = 'user/add_class.html'
     form_valid_message = "The information you entered has been added to your class list."
@@ -85,11 +85,13 @@ class AddClassView(views.LoginRequiredMixin,
         form.instance.user_name = self.request.user
         return super(AddClassView, self).form_valid(form)
 
-class ProfileView(generic.TemplateView):
+class ProfileView(views.LoginRequiredMixin, 
+                  generic.TemplateView):
     template_name = "user/profile.html"
 
 #Bethany Sanders
-class ProfileFinalsView(TemplateView):
+class ProfileFinalsView(views.LoginRequiredMixin,
+                        generic.TemplateView):
         template_name = 'user/finals.html'
         model = Final
 
@@ -103,7 +105,8 @@ class ProfileFinalsView(TemplateView):
             query_results = Final.objects.all().filter(user_name = self.request.user)
             return query_results
 
-class ProfileClassesView(TemplateView):
+class ProfileClassesView(views.LoginRequiredMixin,
+                         generic.TemplateView):
         template_name = 'user/classes.html'
         model = Final
 
@@ -119,3 +122,9 @@ class ProfileClassesView(TemplateView):
                 time = time[:-3]
                 setattr(c, 'class_time', time)
             return classes
+
+def DeleteClassView(request, classId):
+    classToDelete = get_object_or_404(Final, pk=classId)
+    if getattr(classToDelete, 'user_name_id') is request.user.id:
+        classToDelete.delete()
+    return HttpResponseRedirect(reverse_lazy('profile_classes'))
