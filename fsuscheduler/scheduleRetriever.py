@@ -184,8 +184,6 @@ def get_exam_info(url):
     #Return composite dictionary
     return exam_info
 
-
-
 #Bethany Sanders
 def get_specific_final(semester, name, day, time):
     '''Searches the list returned by get_exam_info for the users final time'''
