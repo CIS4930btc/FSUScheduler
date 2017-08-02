@@ -20,29 +20,38 @@ import os
 def get_exam_info(url):
 
     main_page = requests.get(url)
-    #print (main_page.text)
-    if url == "http://www.registrar.fsu.edu/registration_guide/fall/exam_schedule/":
-    	block_exams_text = main_page.text[main_page.text.find("<h2>Block Examinations</h2>"):main_page.text.find("<h2>Monday/Wednesday/Friday Classes</h2>")]
-    	mwf_exams_text = main_page.text[main_page.text.find("<h2>Monday/Wednesday/Friday Classes</h2>"):main_page.text.find("<h2>Tuesday/Thursday Classes</h2>")]
-    	tr_exams_text = main_page.text[main_page.text.find("<h2>Tuesday/Thursday Classes</h2>"):main_page.text.find("<h2>Make-Up Examinations:</h2>")]
-    elif url == "http://www.registrar.fsu.edu/registration_guide/spring/exam_schedule/":
-    	block_exams_text = main_page.text[main_page.text.find("<h2>Block Examinations</h2>"):main_page.text.find("<h2 class=\"pHeading2TOC\" id=\"toc_marker-3-2\">Monday/Wednesday/Friday Classes</h2>")]
-    	mwf_exams_text = main_page.text[main_page.text.find("<h2 class=\"pHeading2TOC\" id=\"toc_marker-3-2\">Monday/Wednesday/Friday Classes</h2>"):main_page.text.find("<h2 class=\"pHeading2TOC\" id=\"toc_marker-3-3\">Tuesday/Thursday Classes</h2>")]
-    	tr_exams_text = main_page.text[main_page.text.find("<h2 class=\"pHeading2TOC\" id=\"toc_marker-3-3\">Tuesday/Thursday Classes</h2>"):main_page.text.find("<h2 class=\"pHeading2TOC\" id=\"toc_marker-3-4\">Make-Up Examinations:</h2>")]
-    else:
-    	return None
-    #print (block_exams_text)
 
+    #print (main_page.text)
+
+    dates_text = main_page.text[main_page.text.find(">Final Examination Week</"):main_page.text.find(">Block Examinations</")]
+    block_exams_text = main_page.text[main_page.text.find(">Block Examinations</"):main_page.text.find(">Monday/Wednesday/Friday Classes</")]
+    mwf_exams_text = main_page.text[main_page.text.find(">Monday/Wednesday/Friday Classes</"):main_page.text.find(">Tuesday/Thursday Classes</")]
+    tr_exams_text = main_page.text[main_page.text.find(">Tuesday/Thursday Classes</"):main_page.text.find(">Make-Up Examinations:</")]
+
+    #Date Retrieval Stuff
+    dates_list = re.findall(r"[A-Z][a-z]{2}[\.]{0,1} [0-9]{1,2}</", dates_text)
+
+    #Trim fat off date_list
+    for i in range(0,len(dates_list)):
+    	dates_list[i] = dates_list[i].replace("</", "")
 
     #Block Exam Stuff
-    block_exam_classes = re.findall(r"<td>[A-Z]{3}[^<]+</td>", block_exams_text)
+    block_exam_classes_raw = re.findall(r"<td>[A-Z]{3}[^<]+</td>", block_exams_text)    	
     block_exam_days = re.findall(r"<td>(Monday|Tuesday|Wednesday|Thursday|Friday)", block_exams_text)
     block_exam_times = re.findall(r"<td>[0-9]{1,2}:[0-9][0-9] . [0-9]{1,2}:[0-9][0-9] ....</td>", block_exams_text)
-
-    #Trim fat off block_exam classes
-    for i in range(0,len(block_exam_classes)):
-    	block_exam_classes[i] = block_exam_classes[i].replace("<td>", "")
-    	block_exam_classes[i] = block_exam_classes[i].replace("</td>", "")
+    
+    """#Trim fat off block_exam_classes_raw
+    for i in range(0,len(block_exam_classes_raw)):
+    	block_exam_classes_raw[i] = block_exam_classes_raw[i].replace("<td>", "")
+    	block_exam_classes_raw[i] = block_exam_classes_raw[i].replace("</td>", "")
+	"""
+    #Adds dates to block_exam_days
+    for i in range(0,len(block_exam_days)):
+    	block_exam_days[i] = block_exam_days[i].replace("Monday", "Monday, " + dates_list[0])
+    	block_exam_days[i] = block_exam_days[i].replace("Tuesday", "Tuesday, " + dates_list[1])
+    	block_exam_days[i] = block_exam_days[i].replace("Wednesday", "Wednesday, " + dates_list[2])
+    	block_exam_days[i] = block_exam_days[i].replace("Thursday", "Thursday, " + dates_list[3])
+    	block_exam_days[i] = block_exam_days[i].replace("Friday", "Friday, " + dates_list[4])
 
     #Trim fat from block_exam_times
     for i in range(0,len(block_exam_times)):
@@ -51,19 +60,59 @@ def get_exam_info(url):
     	if block_exam_times[i].find(" - ") == -1:
     		block_exam_times[i] = block_exam_times[i].replace("-", "- ")
     	block_exam_times[i] = block_exam_times[i].replace("</td>", "")
-    #print (len(block_exam_classes))
+
+    #print (len(block_exam_classes_raw))
     #print (len(block_exam_days))
     #print (len(block_exam_times))
 
-    #Make composite array
+    #Class seperation
     block_exam_info = []
-    for i in range(0,len(block_exam_times)):
-    	block_exam_info += [[block_exam_classes[i],block_exam_days[i],block_exam_times[i]]]
+    block_exam_classes = []
+    for i in range(0, len(block_exam_classes_raw)):
+
+    	if block_exam_classes_raw[i].find(":") != -1:
+    		#print("if")
+    		courseCodes = re.findall(r"[A-Z]{3}", block_exam_classes_raw[i])
+    		courseNumbers = re.findall(r"[0-9]{4}", block_exam_classes_raw[i])
+    		courseCombinations = []
+    		for j in range (0, len(courseCodes)):
+    			for k in range (0, len(courseNumbers)):
+    				courseCombinations += [courseCodes[j] + " " + courseNumbers[k]]
+    		courseCodes = []
+    		courseNumbers = []
+
+    	elif block_exam_classes_raw[i].find(",") != -1:
+    		#print("else")
+    		#print (block_exam_classes_raw[i])
+    		multipleNumbers =  re.findall(r"[A-Z]{3} [0-9]{4}[A-Z]{0,1},[^<]+<", block_exam_classes_raw[i])
+    		if  multipleNumbers[0].find(";") != -1:
+    			multipleNumbers[0] = multipleNumbers[0][:multipleNumbers[0].find(";")]
+    		#print (multipleNumbers)
+    		courseCode = re.findall(r"[A-Z]{3}", multipleNumbers[0])
+    		#print (courseCode)
+    		courseNumbers = re.findall(r"[0-9]{4}[A-Z]{0,1}", multipleNumbers[0])
+    		#print (courseNumbers)
+    		courseCombinations = []
+    		for j in range (0, len(courseNumbers)):
+    			courseCombinations += [courseCode[0] + " " + courseNumbers[j]]
+    		courseCodes = []
+    		courseNumbers = []
+    	#print(courseCombinations)
+    	block_exam_classes += re.findall(r"[A-Z]{3} [0-9]{4}[A-Z]{0,1};", block_exam_classes_raw[i])
+    	block_exam_classes += courseCombinations
+    	#Make composite array and trim fat from class seperation stuff
+    	for j in range (0, len(block_exam_classes)):
+    		block_exam_classes[j] = block_exam_classes[j].replace(";", "")
+    		block_exam_classes[j] = block_exam_classes[j].replace("<", "")
+    		block_exam_classes[j] = block_exam_classes[j].replace(",", "")
+        	block_exam_info += [[block_exam_classes[j],block_exam_days[i],block_exam_times[i]]]
+        block_exam_classes = []
+
+
     #print (block_exam_info)
 
 
-    #MWF stuff
-    # re.findall(r"<td>([0-9]{1,2}:[0-9][0-9] [a|p]\.m\.)|(----)</td>", mwf_exams_text) Does not return time or "----", returns time or empty string
+    #MWF stuff ## re.findall(r"<td>([0-9]{1,2}:[0-9][0-9] [a|p]\.m\.)|(----)</td>", mwf_exams_text) Does not return time or "----", returns time or empty string
     mwf_class_times = re.findall(r"<td>([0-9]{1,2}:[0-9][0-9] [a|p]\.m\.)|(----)</td>", mwf_exams_text)
     mwf_exam_days =  re.findall(r"<td>(Monday|Tuesday|Wednesday|Thursday|Friday)</td>", mwf_exams_text)
     mwf_exam_times =  re.findall(r"<td>[0-9]{1,2}:[0-9][0-9] . [0-9]{1,2}:[0-9][0-9] ....</td>", mwf_exams_text)
@@ -75,6 +124,15 @@ def get_exam_info(url):
     	if mwf_exam_times[i].find(" - ") == -1:
     		mwf_exam_times[i] = mwf_exam_times[i].replace("-", "- ")
     	mwf_exam_times[i] = mwf_exam_times[i].replace("</td>", "")
+
+    #Adds dates to mwf_exam_days
+    for i in range(0,len(mwf_exam_days)):
+    	mwf_exam_days[i] = mwf_exam_days[i].replace("Monday", "Monday, " + dates_list[0])
+    	mwf_exam_days[i] = mwf_exam_days[i].replace("Tuesday", "Tuesday, " + dates_list[1])
+    	mwf_exam_days[i] = mwf_exam_days[i].replace("Wednesday", "Wednesday, " + dates_list[2])
+    	mwf_exam_days[i] = mwf_exam_days[i].replace("Thursday", "Thursday, " + dates_list[3])
+    	mwf_exam_days[i] = mwf_exam_days[i].replace("Friday", "Friday, " + dates_list[4])
+
     #print (len(mwf_class_times))
     #print (len(mwf_exam_days))
     #print (len(mwf_exam_times))
@@ -84,19 +142,30 @@ def get_exam_info(url):
     for i in range(0,len(mwf_exam_times)):
     	#[0] at end of class times because it's a dictionary(not sure why)
     	mwf_exam_info += [[mwf_class_times[i][0],mwf_exam_days[i],mwf_exam_times[i]]]
+
     #print (mwf_exam_info)
 
-    #TR stuff
-    # re.findall(r"<td>([0-9]{1,2}:[0-9][0-9] [a|p]\.m\.)|(----)</td>", tr_exams_text) Does not return time or "----", returns time or empty string
+    #TR stuff ## re.findall(r"<td>([0-9]{1,2}:[0-9][0-9] [a|p]\.m\.)|(----)</td>", tr_exams_text) Does not return time or "----", returns time or empty string
     tr_class_times = re.findall(r"<td>([0-9]{1,2}:[0-9][0-9] [a|p]\.m\.)|(----)</td>", tr_exams_text)
     tr_exam_days =  re.findall(r"<td>(Monday|Tuesday|Wednesday|Thursday|Friday)</td>", tr_exams_text)
     tr_exam_times =  re.findall(r"<td>[0-9]{1,2}:[0-9][0-9] .[ ]?[0-9]{1,2}:[0-9][0-9] ....</td>", tr_exams_text)
+
+    #Trim fat from tr_exam_times
     for i in range(0,len(tr_exam_times)):
     	tr_exam_times[i] = tr_exam_times[i].replace("<td>", "")
     	tr_exam_times[i] = tr_exam_times[i].replace(u"\u2013", "-")
     	if tr_exam_times[i].find(" - ") == -1:
     		tr_exam_times[i] = tr_exam_times[i].replace("-", "- ")
     	tr_exam_times[i] = tr_exam_times[i].replace("</td>", "")
+
+    #Adds dates to tr_exam_days
+    for i in range(0,len(tr_exam_days)):
+    	tr_exam_days[i] = tr_exam_days[i].replace("Monday", "Monday, " + dates_list[0])
+    	tr_exam_days[i] = tr_exam_days[i].replace("Tuesday", "Tuesday, " + dates_list[1])
+    	tr_exam_days[i] = tr_exam_days[i].replace("Wednesday", "Wednesday, " + dates_list[2])
+    	tr_exam_days[i] = tr_exam_days[i].replace("Thursday", "Thursday, " + dates_list[3])
+    	tr_exam_days[i] = tr_exam_days[i].replace("Friday", "Friday, " + dates_list[4])
+
     #print (len(tr_class_times))
     #print (len(tr_exam_days))
     #print (len(tr_exam_times))
@@ -106,6 +175,7 @@ def get_exam_info(url):
     for i in range(0,len(tr_exam_times)):
     	#[0] at end of class times because it's a dictionary(not sure why)
     	tr_exam_info += [[tr_class_times[i][0],tr_exam_days[i],tr_exam_times[i]]]
+    
     #print (tr_exam_info)
 
     #Composite dictionary of composite arrays
