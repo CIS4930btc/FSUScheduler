@@ -64,7 +64,7 @@ class AddClassView(views.LoginRequiredMixin,
     template_name = 'user/add_class.html'
     form_valid_message = "The information you entered has been added to your class list."
     form_invalid_message = "We couldn't find that class."
-    success_url = reverse_lazy('profile')
+    success_url = reverse_lazy('profile_classes')
     Model = Final
 
     def form_valid(self, form):
