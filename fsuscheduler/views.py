@@ -85,7 +85,7 @@ class AddClassView(views.LoginRequiredMixin,
         form.instance.user_name = self.request.user
         return super(AddClassView, self).form_valid(form)
 
-class ProfileView(views.LoginRequiredMixin, 
+class ProfileView(views.LoginRequiredMixin,
                   generic.TemplateView):
     template_name = "user/profile.html"
 

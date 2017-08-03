@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--Bethany Sanders
+  - added all styling for the nav bar
+-->
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,7 +23,14 @@
               <ul class="nav navbar-nav">
                 <li class="active"><a href="{% url 'home' %}">Home</a></li>
                 <li><a href="{% url 'add_class' %}">Add Class</a></li>
-                <li><a href="{% url 'profile' %}">Profile</a></li>
+                 <li class="dropdown">
+                   <a class="dropdown-toggle" data-toggle="dropdown" href="{% url 'profile_classes' %}">Profile
+                   <span class="caret"></span></a>
+                   <ul class="dropdown-menu">
+                     <li><a href="{% url 'profile_classes' %}">My Classes</a></li>
+                     <li><a href="{% url 'profile_finals' %}">My Finals</a></li>
+                   </ul>
+                 </li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
               </ul>
             </div>
