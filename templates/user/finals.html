@@ -22,6 +22,52 @@
               </tr>
             {% endfor %}
         </table>
+      </br>
+        <table class="table .table-inverse">
+          <tbody>
+            <tr>
+              <h2>Calendar View</h2>
+              <tr>
+                <th>Monday</th>
+                {% for item in query_results %}
+                  {% if "Monday" in item.final_info%}
+                    <td>{{ item.class_name }}{{ " "}}{{ item.final_info }}</td>
+                  {% endif %}
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Tuesday</th>
+                {% for item in query_results %}
+                  {% if "Tuesday" in item.final_info%}
+                    <td>{{ item.class_name }}{{ " "}}{{ item.final_info }}</td>
+                  {% endif %}
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Wednesday</th>
+                {% for item in query_results %}
+                  {% if "Wednesday" in item.final_info%}
+                    <td>{{ item.class_name }}{{ " "}}{{ item.final_info }}</td>
+                  {% endif %}
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Thursday</th>
+                {% for item in query_results %}
+                  {% if "Thursday" in item.final_info%}
+                    <td>{{ item.class_name }}{{ " "}}{{ item.final_info }}</td>
+                  {% endif %}
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Friday</th>
+                {% for item in query_results %}
+                  {% if "Friday" in item.final_info%}
+                    <td>{{ item.class_name }}{{ " "}}{{ item.final_info }}</td>
+                  {% endif %}
+                {% endfor %}
+              </tr>
+        </table>
     {% else %}
 	You haven't added any classes <a href="{% url 'add_class' %}">yet</a>.
     {% endif %}
